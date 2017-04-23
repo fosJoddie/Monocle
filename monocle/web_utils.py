@@ -105,6 +105,8 @@ def sighting_to_marker(pokemon, names=POKEMON, moves=MOVES, damage=DAMAGE):
         marker['move2'] = moves[move2]
         marker['damage1'] = damage[move1]
         marker['damage2'] = damage[move2]
+    if pokemon.cp:
+        marker['cp'] = pokemon.cp
     return marker
 
 
