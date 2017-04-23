@@ -796,9 +796,10 @@ class Worker:
 
                 if (normalized not in SIGHTING_CACHE and
                         normalized not in MYSTERY_CACHE):
-                    if (encounter_conf == 'all'
-                            or (encounter_conf == 'some'
-                            and normalized['pokemon_id'] in conf.ENCOUNTER_IDS)):
+                    if ((encounter_conf == 'all'
+                         or (encounter_conf == 'some'
+                             and normalized['pokemon_id'] in conf.ENCOUNTER_IDS))
+                            and self.player_level >= 25):
                         try:
                             await self.encounter(normalized, pokemon['spawn_point_id'])
                         except CancelledError:
@@ -993,6 +994,7 @@ class Worker:
             pokemon['height'] = pdata['height_m']
             pokemon['weight'] = pdata['weight_kg']
             pokemon['gender'] = pdata['pokemon_display']['gender']
+            pokemon['cp'] = pdata['cp']
         except KeyError:
             self.log.error('Missing Pokemon data in encounter response.')
         self.error_code = '!'
