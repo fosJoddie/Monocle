@@ -809,7 +809,7 @@ class Worker:
                             self.log.warning('{} during encounter', e.__class__.__name__)
 
                 if notify_conf and self.notifier.eligible(normalized):
-                    if encounter_conf and 'move_1' not in normalized:
+                    if encounter_conf and 'move_1' not in normalized and self.player_level >= 25:
                         try:
                             await self.encounter(normalized, pokemon['spawn_point_id'])
                         except CancelledError:
@@ -994,7 +994,8 @@ class Worker:
             pokemon['height'] = pdata['height_m']
             pokemon['weight'] = pdata['weight_kg']
             pokemon['gender'] = pdata['pokemon_display']['gender']
-            pokemon['cp'] = pdata['cp']
+            if self.player_level >= 30:
+                pokemon['cp'] = pdata['cp']
         except KeyError:
             self.log.error('Missing Pokemon data in encounter response.')
         self.error_code = '!'
