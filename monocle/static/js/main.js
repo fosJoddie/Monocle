@@ -8,7 +8,7 @@ var PokemonIcon = L.Icon.extend({
         popupAnchor: [0, -15]
     },
     createIcon: function() {
-        var div = document.createElement('div');
+        let div = document.createElement('div');
         div.innerHTML =
             '<div class="pokemarker">' +
               '<div class="pokeimg">' +
@@ -22,7 +22,7 @@ var PokemonIcon = L.Icon.extend({
 
 var FortIcon = L.Icon.extend({
     options: {
-        iconSize: [20, 20],
+        iconSize: [40, 40],
         popupAnchor: [0, -10],
         className: 'fort-icon'
     }
@@ -73,13 +73,13 @@ monitor(overlays.Gyms, true)
 monitor(overlays.Workers, false)
 
 function getPopupContent (item) {
-    var diff = (item.expires_at - new Date().getTime() / 1000);
-    var minutes = parseInt(diff / 60);
-    var seconds = parseInt(diff - (minutes * 60));
-    var expires_at = minutes + 'm ' + seconds + 's';
-    var content = '<b>' + item.name + '</b> - <a href="https://pokemongo.gamepress.gg/pokemon/' + item.pokemon_id + '">#' + item.pokemon_id + '</a>';
+    let diff = (item.expires_at - new Date().getTime() / 1000);
+    let minutes = parseInt(diff / 60);
+    let seconds = parseInt(diff - (minutes * 60));
+    let expires_at = minutes + 'm ' + seconds + 's';
+    let content = '<b>' + item.name + '</b> - <a href="https://pokemongo.gamepress.gg/pokemon/' + item.pokemon_id + '">#' + item.pokemon_id + '</a>';
     if(item.atk != undefined){
-        var totaliv = 100 * (item.atk + item.def + item.sta) / 45;
+        let totaliv = 100 * (item.atk + item.def + item.sta) / 45;
         content += ' - <b>' + totaliv.toFixed(2) + '%</b><br>';
         content += 'Disappears in: ' + expires_at + '<br>';
         content += 'Move 1: ' + item.move1 + ' ( ' + item.damage1 + ' dps )<br>';
@@ -92,7 +92,7 @@ function getPopupContent (item) {
     content += '<a href="#" data-pokeid="'+item.pokemon_id+'" data-newlayer="Hidden" class="popup_filter_link">Hide</a>';
     content += '&nbsp; | &nbsp;';
 
-    var userPref = getPreference('filter-'+item.pokemon_id);
+    let userPref = getPreference('filter-'+item.pokemon_id);
     if (userPref == 'trash'){
         content += '<a href="#" data-pokeid="'+item.pokemon_id+'" data-newlayer="Pokemon" class="popup_filter_link">Move to Pokemon</a>';
     }else{
@@ -110,10 +110,10 @@ function getOpacity (diff) {
 }
 
 function PokemonMarker (raw) {
-    var icon = new PokemonIcon({iconUrl: '/static/monocle-icons/icons/' + raw.pokemon_id + '.png', expires_at: raw.expires_at});
-    var marker = L.marker([raw.lat, raw.lon], {icon: icon, opacity: 1});
+    let icon = new PokemonIcon({iconUrl: '/static/monocle-icons/icons/' + raw.pokemon_id + '.png', expires_at: raw.expires_at});
+    let marker = L.marker([raw.lat, raw.lon], {icon: icon, opacity: 1});
 
-    var intId = parseInt(raw.id.split('-')[1]);
+    let intId = parseInt(raw.id.split('-')[1]);
     if (_last_pokemon_id < intId){
         _last_pokemon_id = intId;
     }
@@ -123,7 +123,7 @@ function PokemonMarker (raw) {
     } else {
         marker.overlay = 'Pokemon';
     }
-    var userPreference = getPreference('filter-'+raw.pokemon_id);
+    let userPreference = getPreference('filter-'+raw.pokemon_id);
     if (userPreference === 'pokemon'){
         marker.overlay = 'Pokemon';
     }else if (userPreference === 'trash'){
@@ -149,7 +149,7 @@ function PokemonMarker (raw) {
         if (marker.overlay === "Hidden" || overlays[marker.overlay].hidden) {
             return;
         }
-        var diff = marker.raw.expires_at - new Date().getTime() / 1000;
+        let diff = marker.raw.expires_at - new Date().getTime() / 1000;
         if (diff > 0) {
             marker.setOpacity(getOpacity(diff));
         } else {
@@ -162,13 +162,22 @@ function PokemonMarker (raw) {
     return marker;
 }
 
+function GymLevel(gymPoints) {
+    const gymPrestiges = [2000, 4000, 8000, 12000, 16000, 20000, 30000, 40000, 50000];
+    let gymLevel = 1;
+    while (gymPoints >= gymPrestiges[gymLevel - 1]) {
+        gymLevel++;
+    }
+    return gymLevel;
+}
+
 function FortMarker (raw) {
-    var icon = new FortIcon({iconUrl: '/static/monocle-icons/forts/' + raw.team + '.png'});
-    var marker = L.marker([raw.lat, raw.lon], {icon: icon, opacity: 1});
+    let icon = new FortIcon({iconUrl: '/static/img/forts/' + raw.team + '_' + GymLevel(raw.prestige) + '.png'});
+    let marker = L.marker([raw.lat, raw.lon], {icon: icon, opacity: 1});
     marker.raw = raw;
     markers[raw.id] = marker;
     marker.on('popupopen',function popupopen (event) {
-        var content = ''
+        let content = ''
         if (raw.team === 0) {
             content = '<b>An empty Gym!</b>'
         }
@@ -193,10 +202,10 @@ function FortMarker (raw) {
 }
 
 function WorkerMarker (raw) {
-    var icon = new WorkerIcon();
-    var marker = L.marker([raw.lat, raw.lon], {icon: icon});
-    var circle = L.circle([raw.lat, raw.lon], 70, {weight: 2});
-    var group = L.featureGroup([marker, circle])
+    let icon = new WorkerIcon();
+    let marker = L.marker([raw.lat, raw.lon], {icon: icon});
+    let circle = L.circle([raw.lat, raw.lon], 70, {weight: 2});
+    let group = L.featureGroup([marker, circle])
         .bindPopup('<b>Worker ' + raw.worker_no + '</b><br>time: ' + raw.time + '<br>speed: ' + raw.speed + '<br>total seen: ' + raw.total_seen + '<br>visits: ' + raw.visits + '<br>seen here: ' + raw.seen_here);
     return group;
 }
@@ -207,7 +216,7 @@ function addPokemonToMap (data, map) {
         if (item.id in markers) {
             return;
         }
-        var marker = PokemonMarker(item);
+        let marker = PokemonMarker(item);
         if (marker.overlay !== "Hidden"){
             marker.addTo(overlays[marker.overlay])
         }
@@ -221,7 +230,7 @@ function addPokemonToMap (data, map) {
 function addGymsToMap (data, map) {
     data.forEach(function (item) {
         // No change since last time? Then don't do anything
-        var existing = markers[item.id];
+        let existing = markers[item.id];
         if (typeof existing !== 'undefined') {
             if (existing.raw.sighting_id === item.sighting_id) {
                 return;
@@ -236,8 +245,8 @@ function addGymsToMap (data, map) {
 
 function addSpawnsToMap (data, map) {
     data.forEach(function (item) {
-        var circle = L.circle([item.lat, item.lon], 5, {weight: 2});
-        var time = '??';
+        let circle = L.circle([item.lat, item.lon], 5, {weight: 2});
+        let time = '??';
         if (item.despawn_time != null) {
             time = '' + Math.floor(item.despawn_time/60) + 'min ' +
                    (item.despawn_time%60) + 'sec';
@@ -255,8 +264,8 @@ function addSpawnsToMap (data, map) {
 
 function addPokestopsToMap (data, map) {
     data.forEach(function (item) {
-        var icon = new PokestopIcon();
-        var marker = L.marker([item.lat, item.lon], {icon: icon});
+        let icon = new PokestopIcon();
+        let marker = L.marker([item.lat, item.lon], {icon: icon});
         marker.raw = item;
         marker.bindPopup('<b>Pokestop: ' + item.external_id + '</b>' +
                          '<br>=&gt; <a href=https://www.google.com/maps/?daddr='+ item.lat + ','+ item.lon +' target="_blank" title="See in Google Maps">Get directions</a>');
@@ -365,9 +374,11 @@ map.whenReady(function () {
     $('.my-location').on('click', function () {
         map.locate({ enableHighAccurracy: true, setView: true });
     });
-    overlays.Gyms.once('add', function(e) {
-        getGyms();
-    })
+    if (overlays.Gyms) {
+        overlays.Gyms.once('add', function (e) {
+            getGyms();
+        })
+    }
     overlays.Spawns.once('add', function(e) {
         getSpawnPoints();
     })
@@ -387,8 +398,8 @@ $("#settings>ul.nav>li>a").on('click', function(){
     // Click handler for each tab button.
     $(this).parent().parent().children("li").removeClass('active');
     $(this).parent().addClass('active');
-    var panel = $(this).data('panel');
-    var item = $("#settings>.settings-panel").removeClass('active')
+    let panel = $(this).data('panel');
+    let item = $("#settings>.settings-panel").removeClass('active')
         .filter("[data-panel='"+panel+"']").addClass('active');
 });
 
@@ -415,22 +426,22 @@ $('#reset_btn').on('click', function () {
 });
 
 $('body').on('click', '.popup_filter_link', function () {
-    var id = $(this).data("pokeid");
-    var layer = $(this).data("newlayer").toLowerCase();
+    let id = $(this).data("pokeid");
+    let layer = $(this).data("newlayer").toLowerCase();
     moveToLayer(id, layer);
-    var item = $("#settings button[data-id='"+id+"']");
+    let item = $("#settings button[data-id='"+id+"']");
     item.removeClass("active").filter("[data-value='"+layer+"']").addClass("active");
 });
 
 $('#settings').on('click', '.settings-panel button', function () {
     //Handler for each button in every settings-panel.
-    var item = $(this);
+    let item = $(this);
     if (item.hasClass('active')){
         return;
     }
-    var id = item.data('id');
-    var key = item.parent().data('group');
-    var value = item.data('value');
+    let id = item.data('id');
+    let key = item.parent().data('group');
+    let value = item.data('value');
 
     item.parent().children("button").removeClass("active");
     item.addClass("active");
@@ -446,8 +457,8 @@ $('#settings').on('click', '.settings-panel button', function () {
 function moveToLayer(id, layer){
     setPreference("filter-"+id, layer);
     layer = layer.toLowerCase();
-    for(var k in markers) {
-        var m = markers[k];
+    for(let k in markers) {
+        let m = markers[k];
         if ((k.indexOf("pokemon-") > -1) && (m !== undefined) && (m.raw.pokemon_id === id)){
             m.removeFrom(overlays[m.overlay]);
             if (layer === 'pokemon'){
@@ -462,10 +473,10 @@ function moveToLayer(id, layer){
 }
 
 function populateSettingsPanels(){
-    var container = $('.settings-panel[data-panel="filters"]').children('.panel-body');
-    var newHtml = '';
-    for (var i = 1; i <= _pokemon_count; i++){
-        var partHtml = `<div class="text-center">
+    let container = $('.settings-panel[data-panel="filters"]').children('.panel-body');
+    let newHtml = '';
+    for (let i = 1; i <= _pokemon_count; i++){
+        let partHtml = `<div class="text-center">
                 <img src="static/monocle-icons/icons/`+i+`.png">
                 <div class="btn-group" role="group" data-group="filter-`+i+`">
                   <button type="button" class="btn btn-default" data-id="`+i+`" data-value="pokemon">Pokémon</button>
@@ -482,14 +493,14 @@ function populateSettingsPanels(){
 }
 
 function setSettingsDefaults(){
-    for (var i = 1; i <= _pokemon_count; i++){
+    for (let i = 1; i <= _pokemon_count; i++){
         _defaultSettings['filter-'+i] = (_defaultSettings['TRASH_IDS'].indexOf(i) > -1) ? "trash" : "pokemon";
     };
 
     $("#settings div.btn-group").each(function(){
-        var item = $(this);
-        var key = item.data('group');
-        var value = getPreference(key);
+        let item = $(this);
+        let key = item.data('group');
+        let value = getPreference(key);
         if (value === false)
             value = "0";
         else if (value === true)
@@ -532,10 +543,10 @@ $('.scroll-up').click(function () {
 });
 
 function calculateRemainingTime(expire_at_timestamp) {
-  var diff = (expire_at_timestamp - new Date().getTime() / 1000);
-        var minutes = parseInt(diff / 60);
-        var seconds = parseInt(diff - (minutes * 60));
-        return minutes + ':' + (seconds > 9 ? "" + seconds: "0" + seconds);
+    let diff = (expire_at_timestamp - new Date().getTime() / 1000);
+    let minutes = parseInt(diff / 60);
+    let seconds = parseInt(diff - (minutes * 60));
+    return minutes + ':' + (seconds > 9 ? "" + seconds: "0" + seconds);
 }
 
 function updateTime() {
