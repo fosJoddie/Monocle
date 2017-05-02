@@ -44,9 +44,8 @@ var PokestopIcon = L.Icon.extend({
 
 var markers = {};
 var overlays = {
-    Pokemon: L.layerGroup([]),
-    Trash: L.layerGroup([]),
-    Workers: L.layerGroup([])
+    Gyms: L.layerGroup([]),
+    Pokestops: L.layerGroup([])
 };
 
 function unsetHidden (event) {
@@ -63,9 +62,7 @@ function monitor (group, initial) {
     group.on('remove', setHidden);
 }
 
-monitor(overlays.Pokemon, false)
-monitor(overlays.Trash, true)
-monitor(overlays.Workers, false)
+monitor(overlays.Gyms, true)
 
 function getPopupContent (item) {
     let diff = (item.expires_at - new Date().getTime() / 1000);
@@ -357,7 +354,7 @@ function getWorkers() {
 
 var map = L.map('main-map', {preferCanvas: true}).setView(_MapCoords, 13);
 
-overlays.Pokemon.addTo(map);
+overlays.Gyms.addTo(map);
 
 var control = L.control.layers(null, overlays).addTo(map);
 L.tileLayer(_MapProviderUrl, {
@@ -368,11 +365,13 @@ map.whenReady(function () {
     $('.my-location').on('click', function () {
         map.locate({ enableHighAccurracy: true, setView: true });
     });
-    getWorkers();
-    overlays.Workers.hidden = true;
-    setInterval(getWorkers, 14000);
-    getPokemon();
-    setInterval(getPokemon, 30000);
+
+    getGyms();
+
+    overlays.Pokestops.once('add', function(e) {
+        getPokestops();
+    });
+    setInterval(getGyms, 110000)
 });
 
 $("#settings>ul.nav>li>a").on('click', function(){
@@ -456,6 +455,19 @@ function moveToLayer(id, layer){
 function populateSettingsPanels(){
     let container = $('.settings-panel[data-panel="filters"]').children('.panel-body');
     let newHtml = '';
+    for (let i = 1; i <= _pokemon_count; i++){
+        let partHtml = `<div class="text-center">
+                <img src="static/monocle-icons/icons/`+i+`.png">
+                <div class="btn-group" role="group" data-group="filter-`+i+`">
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="pokemon">Pokémon</button>
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="trash">Trash</button>
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="hidden">Hide</button>
+                </div>
+            </div>
+        `;
+
+        newHtml += partHtml
+    }
     newHtml += '</div>';
     container.html(newHtml);
 }
