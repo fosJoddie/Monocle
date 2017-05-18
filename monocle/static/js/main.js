@@ -456,6 +456,19 @@ function moveToLayer(id, layer){
 function populateSettingsPanels(){
     let container = $('.settings-panel[data-panel="filters"]').children('.panel-body');
     let newHtml = '';
+    for (let i = 1; i <= _pokemon_count; i++){
+        let partHtml = `<div class="text-center">
+                <img src="static/monocle-icons/icons/`+i+`.png">
+                <div class="btn-group" role="group" data-group="filter-`+i+`">
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="pokemon">Pokémon</button>
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="trash">Trash</button>
+                  <button type="button" class="btn btn-default" data-id="`+i+`" data-value="hidden">Hide</button>
+                </div>
+            </div>
+        `;
+
+        newHtml += partHtml
+    }
     newHtml += '</div>';
     container.html(newHtml);
 }
