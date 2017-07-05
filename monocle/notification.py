@@ -771,7 +771,9 @@ class Notifier:
                 "cp": raid['cp'],
                 "move_1": raid['move_1'],
                 "move_2": raid['move_2'],
-                "raid_end": raid['raid_end'],
+                "start": raid['raid_start'],
+                "end": raid['raid_end'],
+                "level": raid['raid_level'],
                 "latitude": fort['lat'],
                 "longitude": fort['lon']
             }
