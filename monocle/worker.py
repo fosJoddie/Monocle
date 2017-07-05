@@ -845,7 +845,7 @@ class Worker:
                             db_proc.add(normalized_raid)
 
                             # notify about raid only when we got a mon
-                            if notify_conf and raid_info.HasField('raid_pokemon'):
+                            if notify_conf:
                                 LOOP.create_task(self.notifier.notifyRaid(normalized_raid,self.normalize_gym(fort)))
 
             if more_points:
