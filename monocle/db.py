@@ -351,7 +351,10 @@ class RaidInfo(Base):
 
     id = Column(Integer, primary_key=True)
     fort_id = Column(Integer, ForeignKey('forts.id'))
-    raid_seed = Column(HUGE_TYPE)
+    if conf.DB_ENGINE.startswith('mysql'):
+        raid_seed = Column(BIGINT)
+    elif conf.DB_ENGINE.startswith('postgres'):
+        raid_seed = Column(HUGE_TYPE)
     raid_level = Column(TINY_TYPE)
     raid_spawn = Column(Integer)
     raid_start = Column(Integer, index=True)
