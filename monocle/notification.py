@@ -755,14 +755,14 @@ class Notifier:
             return self.cleanup(encounter_id, cache_handle)
 
     # Notify about a raid through webhook - TODO refactor notify to support raid + pokemon in one
-    async def notifyRaid(self, raid_info,gym):
+    async def notifyRaid(self, raid_info, gym):
         if WEBHOOK:
-            whpushed = await self.webhookRaid(raid_info,gym)
+            whpushed = await self.webhookRaid(raid_info, gym)
 
         # FIXME figure out wtf notify() does if whpushed goes wrong
         return True
 
-    async def webhookRaid(self, raid,fort):
+    async def webhookRaid(self, raid, fort):
         data = {
             'type': "raid",
             'message': {
